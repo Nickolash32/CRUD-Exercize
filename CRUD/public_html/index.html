@@ -42,9 +42,9 @@ and open the template in the editor.
             </thead>
             <tbody>
                 <tr ng-repeat="produto in produtos track by $index">
-                    <td>{{produto.id}}</td>
-                    <td>{{produto.descricao}}</td>
-                    <td>{{produto.preco}}</td>
+                    <td ng-click="editar(produto)">{{produto.id}}</td>
+                    <td ng-click="editar(produto)">{{produto.descricao}}</td>
+                    <td ng-click="editar(produto)">{{produto.preco}}</td>
                     <td><a href="" ng-click="editar(produto)">[Editar]</a></td>
                     <td><a href="" ng-click="excluir(produto)">[Excluir]</a></td>
                 </tr>
@@ -56,7 +56,33 @@ and open the template in the editor.
         
         <script>
             var app = angular.module('produtosApp', []);
-            app.controller("ProdutosController", function($scope){
+            app.controller("ProdutosController", function($scope, ProdutosService){
+                
+            
+            $scope.produto = {};
+            
+            $scope.produtos = ProdutosService.listar();
+            
+            $scope.salvar = function(produto) {
+                ProdutosService.salvar(produto);
+                $scope.produto = {};
+            };
+            
+            $scope.excluir = function(produto) {
+                ProdutosService.excluir(produto);
+            };
+            
+            $scope.editar = function(produto) {
+                $scope.produto = angular.copy(produto);
+            };
+            
+            $scope.cancelar = function(){
+                $scope.produto = {};
+            };
+            
+            });
+            
+            app.service('ProdutosService', function(){
                 var produtos = [{
                         id: 1,
                         descricao: "Arroz",
@@ -67,11 +93,11 @@ and open the template in the editor.
                         preco: 3.50
                 }];
             
-            $scope.produto = {};
+            this.listar = function(){
+                return produtos;
+            };
             
-            $scope.produtos = produtos;
-            
-            $scope.salvar = function(produto) {
+            this.salvar = function(produto){
                 var produtoEncontrado = false;
                 for(var i=0, length = produtos.length; i<length; i++){
                   if(produtos[i].id == produto.id){
@@ -84,23 +110,15 @@ and open the template in the editor.
                 if(!produtoEncontrado){
                     produtos.push(produto);
                 }
-                $scope.produto = {};
             };
             
-            $scope.excluir = function(produto) {
-              for(var i=0, length = produtos.length; i<length; i++){
+            this.excluir = function(produto){
+                for(var i=0, length = produtos.length; i<length; i++){
                   if(produtos[i].id == produto.id){
                       produtos.splice(i, 1);
+                      break;
                   }
-              }  
-            };
-            
-            $scope.editar = function(produto) {
-                $scope.produto = angular.copy(produto);
-            };
-            
-            $scope.cancelar = function(){
-                $scope.produto = {};
+              }
             };
             
             });
